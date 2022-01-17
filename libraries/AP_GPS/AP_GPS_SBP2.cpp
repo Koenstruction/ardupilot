@@ -207,7 +207,16 @@ AP_GPS_SBP2::_sbp_process_message() {
             check_new_itow(last_event.tow, parser_state.msg_len);
             logging_ext_event();
             break;
-
+// Koen from here:
+        case SBP_HEADING_MSGTYPE:
+            memcpy(&last_baseline_heading, parser_state.msg_buff, sizeof(struct sbp_baseline_heading_t));
+            check_new_itow(last_baseline_heading.tow, parser_state.msg_len);
+            state.gps_yaw_configured = true;                                                            // AP_GPS.h r.181
+            //state.gps_yaw_accuracy = _buffer.relposned.accHeading * 1e-5;     ...to be continued      // AP_GPS.h r.189
+            state.have_gps_yaw = true;                                                                  // AP_GPS.h r.194
+            state.have_gps_yaw_accuracy = false;                                                        // AP_GPS.h r.195
+            break;
+// Koen to here
         default:
             break;
     }
@@ -305,7 +314,10 @@ AP_GPS_SBP2::_attempt_state_update()
         float ground_vector_sq = state.velocity[0]*state.velocity[0] + state.velocity[1]*state.velocity[1];
         state.ground_speed = safe_sqrt(ground_vector_sq);
 
-        state.ground_course = wrap_360(degrees(atan2f(state.velocity[1], state.velocity[0])));
+        //state.ground_course = wrap_360(degrees(atan2f(state.velocity[1], state.velocity[0])));        // Original
+        state.ground_course = (float)(last_baseline_heading.heading * 1.0e-3);
+        state.gps_yaw =  (float)(last_baseline_heading.heading * 1.0e-3);
+        state.relPosHeading = (float)(last_baseline_heading.heading * 1.0e-3);
 
         state.speed_accuracy        = safe_sqrt(
                                         powf((float)last_vel_ned.h_accuracy * 1.0e-3f, 2) + 

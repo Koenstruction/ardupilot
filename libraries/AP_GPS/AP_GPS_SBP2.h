@@ -79,6 +79,7 @@ private:
     static const uint16_t SBP_TRACKING_STATE_MSGTYPE = 0x0013;
     static const uint16_t SBP_IAR_STATE_MSGTYPE      = 0x0019;
     static const uint16_t SBP_EXT_EVENT_MSGTYPE      = 0x0101;
+    static const uint16_t SBP_HEADING_MSGTYPE        = 0x020F;      // Added by Koen
 
     // Heartbeat
     struct PACKED sbp_heartbeat_t {
@@ -151,6 +152,22 @@ private:
         } flags;
     }; // 22 bytes
 
+// Koen from here:
+
+    // Heading relative to True North
+    struct PACKED sbp_baseline_heading_t {
+        uint32_t tow;           //< GPS Time of Week (unit: ms)
+        uint32_t heading;       //< Heading relative to True North (unit: mdeg)
+        uint8_t n_sats;         //< Number of satellites used in solution
+        struct PACKED flags {
+            uint8_t fix_mode:3;  //< Fix mode (0: invalid, 1: Reserved, 2: Differential GNSS (DGNSS), 3: Float RTK, 4: Fixed RTK
+            uint8_t ins_mode:2;  //< Inertial navigation mode (0: none, 1: INS used)
+            uint8_t res:3;       //< Reserved
+        } flags;
+    }; // 10 bytes
+
+// Koen to here
+
     // Messages reporting accurately-timestamped external events, e.g. camera shutter time.
     struct PACKED sbp_ext_event_t {
         uint16_t wn;           //< GPS week number (unit: weeks)
@@ -174,12 +191,14 @@ private:
     uint32_t last_heartbeat_received_ms;
     uint32_t last_injected_data_ms;
 
-    struct sbp_heartbeat_t last_heartbeat;
-    struct sbp_gps_time_t  last_gps_time;
-    struct sbp_dops_t      last_dops;
-    struct sbp_pos_llh_t   last_pos_llh;
-    struct sbp_vel_ned_t   last_vel_ned;
-    struct sbp_ext_event_t last_event;
+    struct sbp_heartbeat_t          last_heartbeat;
+    struct sbp_gps_time_t           last_gps_time;
+    struct sbp_dops_t               last_dops;
+    struct sbp_pos_llh_t            last_pos_llh;
+    struct sbp_vel_ned_t            last_vel_ned;
+    struct sbp_ext_event_t          last_event;
+    struct sbp_baseline_heading_t   last_baseline_heading;
+
 
     uint32_t               last_full_update_tow;
     uint16_t               last_full_update_wn;

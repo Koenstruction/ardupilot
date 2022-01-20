@@ -211,6 +211,7 @@ AP_GPS_SBP2::_sbp_process_message() {
         case SBP_HEADING_MSGTYPE:
             memcpy(&last_baseline_heading, parser_state.msg_buff, sizeof(struct sbp_baseline_heading_t));
             check_new_itow(last_baseline_heading.tow, parser_state.msg_len);
+            // The next states, should not get triggered every time, just once is enough:
             state.gps_yaw_configured = true;                                                            // AP_GPS.h r.181
             //state.gps_yaw_accuracy = _buffer.relposned.accHeading * 1e-5;     ...to be continued      // AP_GPS.h r.189
             state.have_gps_yaw = true;                                                                  // AP_GPS.h r.194

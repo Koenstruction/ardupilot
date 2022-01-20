@@ -161,8 +161,8 @@ private:
         uint8_t n_sats;         //< Number of satellites used in solution
         struct PACKED flags {
             uint8_t fix_mode:3;  //< Fix mode (0: invalid, 1: Reserved, 2: Differential GNSS (DGNSS), 3: Float RTK, 4: Fixed RTK
-            uint8_t ins_mode:2;  //< Inertial navigation mode (0: none, 1: INS used)
-            uint8_t res:3;       //< Reserved
+            //uint8_t ins_mode:2;  //< Inertial navigation mode (0: none, 1: INS used)
+            uint8_t res:5;       //< Reserved
         } flags;
     }; // 10 bytes
 
